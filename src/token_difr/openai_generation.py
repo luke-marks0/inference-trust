@@ -105,49 +105,24 @@ def _split_prompt_and_completion(
     usage: dict[str, Any] | None,
     prompt_token_ids_fallback: list[int],
 ) -> CompletionTokens:
-    prompt_tokens = None
+    # generate_completion_tokens always uses echo=False, so token_ids contains
+    # only the completion tokens — the prompt is never present in the response.
+    # Always use prompt_token_ids_fallback as the prompt; only use usage to
+    # determine how many completion tokens to keep.
     completion_tokens = None
     if isinstance(usage, dict):
-        raw_prompt = usage.get("prompt_tokens")
         raw_completion = usage.get("completion_tokens")
-        if isinstance(raw_prompt, int):
-            prompt_tokens = raw_prompt
-        if isinstance(raw_completion, int):
+        if isinstance(raw_completion, int) and raw_completion >= 0:
             completion_tokens = raw_completion
 
-    if prompt_tokens is None:
-        prompt_tokens = len(prompt_token_ids_fallback)
-
-    if completion_tokens is None:
-        completion_tokens = len(token_ids) - prompt_tokens
-    if completion_tokens < 0:
-        completion_tokens = len(token_ids)
-
-    split_index = prompt_tokens
-    if split_index > len(token_ids):
-        if completion_tokens == len(token_ids):
-            output_ids = [int(token) for token in token_ids[:completion_tokens]]
-            return CompletionTokens(
-                prompt_token_ids=[int(token) for token in prompt_token_ids_fallback],
-                output_token_ids=output_ids,
-                completion_tokens=len(output_ids),
-            )
-        raise ValueError(
-            "Completion response usage.prompt_tokens exceeds parsed token payload "
-            f"(prompt_tokens={prompt_tokens}, parsed_tokens={len(token_ids)})."
-        )
-
-    prompt_ids = [int(token) for token in token_ids[:split_index]]
-    output_ids = [int(token) for token in token_ids[split_index:]]
-    if completion_tokens < len(output_ids):
+    output_ids = [int(t) for t in token_ids]
+    if completion_tokens is not None and completion_tokens < len(output_ids):
         output_ids = output_ids[:completion_tokens]
-    elif completion_tokens > len(output_ids):
-        completion_tokens = len(output_ids)
 
     return CompletionTokens(
-        prompt_token_ids=prompt_ids,
+        prompt_token_ids=[int(t) for t in prompt_token_ids_fallback],
         output_token_ids=output_ids,
-        completion_tokens=completion_tokens,
+        completion_tokens=len(output_ids),
     )
 
 
