@@ -22,6 +22,7 @@ FIREWORKS_MODEL_REGISTRY: dict[str, str] = {
     "Qwen/Qwen3-32B": "accounts/fireworks/models/qwen3-32b",
     "Qwen/Qwen3-235B-A22B-Instruct-2507": "accounts/fireworks/models/qwen3-235b-a22b-instruct-2507",
     "Qwen/Qwen3-Coder-480B-A35B-Instruct": "accounts/fireworks/models/qwen3-coder-480b-a35b-instruct",
+    "Qwen/Qwen3.5-9B": "accounts/fireworks/models/qwen3p5-9b",
     # DeepSeek models
     "deepseek-ai/DeepSeek-V4-Flash": "accounts/fireworks/models/deepseek-v4-flash",
     "deepseek-ai/DeepSeek-V3.2": "accounts/fireworks/models/deepseek-v3p2",
@@ -35,6 +36,8 @@ FIREWORKS_MODEL_REGISTRY: dict[str, str] = {
     # OpenAI OSS models
     "openai/gpt-oss-20b": "accounts/fireworks/models/gpt-oss-20b",
     "openai/gpt-oss-120b": "accounts/fireworks/models/gpt-oss-120b",
+    # Google models
+    "google/gemma-4-31B-it": "accounts/fireworks/models/gemma-4-31b-it",
 }
 
 # HuggingFace name -> OpenRouter name (only for models that differ from hf_name.lower())
