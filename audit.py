@@ -605,48 +605,31 @@ def _resolve_fireworks_account_id(api_key: str) -> str:
     return unique_ids[0]
 
 
-def _iter_fireworks_deployment_shapes(api_key: str, account_id: str) -> list[dict]:
-    """List available deployment shapes for an account."""
-    encoded_account = urllib.parse.quote(account_id, safe="")
-    path = f"/v1/accounts/{encoded_account}/deploymentShapes"
-    payload = _fireworks_request("GET", path, api_key)
-    shapes = payload.get("deploymentShapes")
-    if isinstance(shapes, list):
-        return [shape for shape in shapes if isinstance(shape, dict)]
-    return []
+def _get_fireworks_deployment_shape_name(api_key: str, base_model: str) -> str | None:
+    """Find a validated deployment shape name for the given model.
 
-
-def _select_fireworks_deployment_shape(api_key: str, account_id: str, base_model: str) -> dict | None:
-    """Select a deployment shape compatible with the requested base model."""
+    Uses the global wildcard versions endpoint with a model filter — the same
+    approach that reliably works for Fireworks-hosted models regardless of
+    which account is making the request.
+    """
+    filter_str = f'snapshot.base_model="{base_model}" AND latest_validated=true'
+    params = urllib.parse.urlencode({"filter": filter_str, "order_by": "create_time desc"})
+    path = f"/v1/accounts/-/deploymentShapes/-/versions?{params}"
     try:
-        shapes = _iter_fireworks_deployment_shapes(api_key, account_id)
+        payload = _fireworks_request("GET", path, api_key)
     except Exception as exc:
-        print(
-            "Warning: unable to list Fireworks deployment shapes "
-            f"(continuing without explicit shape): {exc}"
-        )
+        print(f"Warning: unable to fetch deployment shapes ({exc}); continuing without shape.")
         return None
-    candidates = [shape for shape in shapes if shape.get("baseModel") == base_model]
-    if not candidates:
+    versions = payload.get("deploymentShapeVersions")
+    if not isinstance(versions, list) or not versions:
         return None
-
-    precision_priority = {
-        "BF16": 0,
-        "FP16": 1,
-        "PRECISION_UNSPECIFIED": 2,
-        "FP8_MM": 3,
-        "FP8_DYNAMIC": 4,
-    }
-
-    def rank(shape: dict) -> tuple[int, int]:
-        precision = shape.get("precision")
-        count = shape.get("acceleratorCount")
-        precision_rank = precision_priority.get(precision, 99)
-        accelerator_count = int(count) if isinstance(count, int) else 999
-        return (precision_rank, accelerator_count)
-
-    candidates.sort(key=rank)
-    return candidates[0]
+    version_name = versions[0].get("name", "")
+    if not version_name or "/versions/" not in version_name:
+        return None
+    # Shape name is the version name with the trailing /versions/<id> stripped
+    shape_name = "/".join(version_name.split("/")[:-2])
+    print(f"Found deployment shape: {shape_name}")
+    return shape_name
 
 
 def _create_temp_fireworks_deployment_via_api(
@@ -662,14 +645,15 @@ def _create_temp_fireworks_deployment_via_api(
     timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
     slug = "".join(ch.lower() if ch.isalnum() else "-" for ch in hf_model).strip("-")
     slug = "-".join(part for part in slug.split("-") if part)[:32] or "model"
-    deployment_id = f"audit-{slug}-{timestamp}"[:63].rstrip("-")
+    display_name = f"audit-{slug}-{timestamp}"[:63].rstrip("-")
 
     encoded_account = urllib.parse.quote(account_id, safe="")
-    query = urllib.parse.urlencode({"deploymentId": deployment_id})
-    path = f"/v1/accounts/{encoded_account}/deployments?{query}"
+    path = f"/v1/accounts/{encoded_account}/deployments"
     base_payload = {
         "baseModel": base_model,
-        "displayName": f"audit-{slug}-{timestamp}",
+        "minReplicaCount": 0,
+        "maxReplicaCount": 1,
+        "displayName": display_name,
     }
 
     payload_candidates: list[dict] = []
@@ -683,29 +667,13 @@ def _create_temp_fireworks_deployment_via_api(
         payload_candidates.append(payload)
         return True
 
-    shape = _select_fireworks_deployment_shape(api_key, account_id, base_model)
-    if shape:
-        shaped_payload = dict(base_payload)
-        accelerator_type = shape.get("acceleratorType")
-        accelerator_count = shape.get("acceleratorCount")
-        precision = shape.get("precision")
-        if isinstance(accelerator_type, str) and accelerator_type:
-            shaped_payload["acceleratorType"] = accelerator_type
-        if isinstance(accelerator_count, int) and accelerator_count > 0:
-            shaped_payload["acceleratorCount"] = accelerator_count
-        if isinstance(precision, str) and precision:
-            shaped_payload["precision"] = precision
-        add_payload(shaped_payload)
+    # Primary: use a validated deployment shape name, same approach as the standalone script.
+    # The global wildcard versions endpoint finds Fireworks-hosted shapes regardless of account.
+    shape_name = _get_fireworks_deployment_shape_name(api_key, base_model)
+    if shape_name:
+        add_payload({**base_payload, "deploymentShape": shape_name})
 
-    # Retry create with progressively safer payloads.
-    # Some accounts cannot query shapes or fail with FP8/default constraints.
-    add_payload(dict(base_payload))
-    add_payload({**base_payload, "precision": "BF16"})
-    add_payload({**base_payload, "precision": "FP16"})
-    add_payload({**base_payload, "precision": "PRECISION_UNSPECIFIED"})
-
-    # Common precision/accelerator fallback matrix for large models.
-    # acceleratorCount starts at 1 and is increased dynamically if API asks for a minimum.
+    # Fallback matrix for cases where shape lookup fails or the shape is unavailable.
     known_accelerators = [
         "NVIDIA_B200_180GB",
         "NVIDIA_H200_141GB",
@@ -740,12 +708,12 @@ def _create_temp_fireworks_deployment_via_api(
             response = _fireworks_request("POST", path, api_key, payload=payload)
             deployment_name = response.get("name")
             if not isinstance(deployment_name, str) or "/deployments/" not in deployment_name:
-                deployment_name = f"accounts/{account_id}/deployments/{deployment_id}"
+                deployment_name = f"accounts/{account_id}/deployments/{display_name}"
             print(f"Created temporary deployment: {deployment_name}")
             return deployment_name
         except Exception as exc:
             last_error = exc
-            payload_desc = {k: payload[k] for k in ("precision", "acceleratorType", "acceleratorCount") if k in payload}
+            payload_desc = {k: payload[k] for k in ("precision", "acceleratorType", "acceleratorCount", "deploymentShape") if k in payload}
             print(f"Create deployment attempt failed with payload {payload_desc or '{default}'}: {exc}")
 
             message = str(exc)
