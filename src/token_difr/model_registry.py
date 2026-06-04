@@ -24,6 +24,9 @@ FIREWORKS_MODEL_REGISTRY: dict[str, str] = {
     "Qwen/Qwen3-Coder-480B-A35B-Instruct": "accounts/fireworks/models/qwen3-coder-480b-a35b-instruct",
     "Qwen/Qwen3.5-9B": "accounts/fireworks/models/qwen3p5-9b",
     "Qwen/Qwen3.5-27B": "accounts/fireworks/models/qwen3p5-27b",
+    "Qwen/Qwen3.5-35B-A3B": "accounts/fireworks/models/qwen3p5-35b-a3b",
+    "Qwen/Qwen3.6-27B": "accounts/fireworks/models/qwen3p6-27b",
+    "Qwen/Qwen3.6-35B-A3B": "accounts/fireworks/models/qwen3p6-35b-a3b",
     # DeepSeek models
     "deepseek-ai/DeepSeek-V4-Flash": "accounts/fireworks/models/deepseek-v4-flash",
     "deepseek-ai/DeepSeek-V3.2": "accounts/fireworks/models/deepseek-v3p2",
@@ -38,9 +41,8 @@ FIREWORKS_MODEL_REGISTRY: dict[str, str] = {
     "openai/gpt-oss-20b": "accounts/fireworks/models/gpt-oss-20b",
     "openai/gpt-oss-120b": "accounts/fireworks/models/gpt-oss-120b",
     # Google models
+    "google/gemma-4-26B-A4B-it": "accounts/fireworks/models/gemma-4-26b-a4b-it",
     "google/gemma-4-31B-it": "accounts/fireworks/models/gemma-4-31b-it",
-    # Meta models
-    "meta-llama/Llama-3.3-70B-Instruct": "accounts/fireworks/models/llama-v3p3-70b-instruct",
 }
 
 # HuggingFace name -> OpenRouter name (only for models that differ from hf_name.lower())
@@ -49,6 +51,10 @@ OPENROUTER_MODEL_REGISTRY: dict[str, str] = {
     "Qwen/Qwen3-235B-A22B-Instruct-2507": "qwen/qwen3-235b-a22b-2507",
     "Qwen/Qwen3-Coder-480B-A35B-Instruct": "qwen/qwen3-coder",
     "Qwen/Qwen3.5-27B": "qwen/qwen3.5-27b",
+    "Qwen/Qwen3.5-35B-A3B": "qwen/qwen3.5-35b-a3b",
+    "Qwen/Qwen3.6-27B": "qwen/qwen3.6-27b",
+    "Qwen/Qwen3.6-35B-A3B": "qwen/qwen3.6-35b-a3b",
+    "google/gemma-4-26B-A4B-it": "google/gemma-4-26b-a4b-it",
     "deepseek-ai/DeepSeek-V4-Flash": "deepseek/deepseek-v4-flash",
     "deepseek-ai/DeepSeek-V3.2": "deepseek/deepseek-v3.2",
     "MiniMaxAI/MiniMax-M2.1": "minimax/minimax-m2.1",
