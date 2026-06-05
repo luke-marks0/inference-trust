@@ -1,0 +1,12 @@
+{
+  "model": "moonshotai/Kimi-K2.6",
+  "served_model_name": "",
+  "tensor_parallel_size": 8,
+  "dtype": "bfloat16",
+  "gpu_memory_utilization": 0.93,
+  "max_model_len": 8192,
+  "trust_remote_code": true,
+  "modal_gpu": "H100:8",
+  "modal_min_containers": 0,
+  "modal_scaledown_window_seconds": 60
+}
