@@ -66,7 +66,7 @@ def _get_env_int(name: str, default: int) -> int:
         return default
 
 
-DEFAULT_MODAL_VERIFICATION_CONCURRENCY = _get_env_int("TOKEN_DIFR_MODAL_VERIFICATION_CONCURRENCY", 1)
+DEFAULT_VAST_VERIFICATION_CONCURRENCY = _get_env_int("TOKEN_DIFR_VAST_VERIFICATION_CONCURRENCY", 10)
 
 
 def _resolve_fireworks_verification_model(hf_model: str, fireworks_verification_model: str | None = None) -> str:
@@ -143,20 +143,20 @@ def _resolve_verification_config(
         verifier_base_url = _normalize_openai_base_url(raw_base_url, ensure_v1_path=False)
         request_extra_body: dict[str, object] | None = None
         concurrency = 10
-    elif backend == "modal":
-        api_key = verification_api_key or os.environ.get("MODAL_VERIFICATION_API_KEY") or "modal-verification"
-        raw_base_url = verification_base_url or os.environ.get("MODAL_VERIFICATION_BASE_URL")
+    elif backend == "vast":
+        api_key = verification_api_key or os.environ.get("VAST_VERIFICATION_API_KEY") or "vast-verification"
+        raw_base_url = verification_base_url or os.environ.get("VAST_VERIFICATION_BASE_URL")
         if not raw_base_url:
             raise ValueError(
-                "Modal verification requires --verification-base-url or MODAL_VERIFICATION_BASE_URL."
+                "Vast verification requires --verification-base-url or VAST_VERIFICATION_BASE_URL."
             )
         verifier_base_url = _normalize_openai_base_url(raw_base_url, ensure_v1_path=True)
         resolved_verification_model = verification_model or hf_model
         request_extra_body = {"return_tokens_as_token_ids": True}
-        concurrency = DEFAULT_MODAL_VERIFICATION_CONCURRENCY
+        concurrency = DEFAULT_VAST_VERIFICATION_CONCURRENCY
     else:
         raise ValueError(
-            f"Unsupported verification backend {verification_backend!r}. Expected 'fireworks' or 'modal'."
+            f"Unsupported verification backend {verification_backend!r}. Expected 'fireworks' or 'vast'."
         )
 
     return VerificationConfig(
@@ -410,7 +410,7 @@ def audit_provider(
             Can be a serverless model path
             (e.g., "accounts/fireworks/models/qwen3-8b") or an on-demand deployment
             path (e.g., "accounts/<account>/deployments/<deployment-id>").
-        verification_backend: Verification backend ('fireworks' or 'modal').
+        verification_backend: Verification backend ('fireworks' or 'vast').
         verification_model: Optional backend-specific override model/deployment.
         verification_base_url: Optional backend base URL override.
         verification_api_key: Optional backend API key override.

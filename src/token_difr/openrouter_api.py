@@ -306,24 +306,37 @@ async def generate_openrouter_responses(
     semaphore = asyncio.Semaphore(concurrency)
     extra_body: dict = {"provider": {"only": [provider]}}
 
-    async def _request(idx: int, messages: list[dict[str, str]]) -> tuple[int, ChatCompletion]:
+    async def _request(idx: int, messages: list[dict[str, str]]) -> tuple[int, ChatCompletion | None]:
         async with semaphore:
-            completion = await client.chat.completions.create(
-                model=model,
-                messages=messages,  # type: ignore[arg-type]
-                max_tokens=max_tokens,
-                temperature=temperature,
-                seed=seed,
-                extra_body=extra_body,
-            )
-            return idx, completion
+            for attempt in range(4):
+                try:
+                    completion = await client.chat.completions.create(
+                        model=model,
+                        messages=messages,  # type: ignore[arg-type]
+                        max_tokens=max_tokens,
+                        temperature=temperature,
+                        seed=seed,
+                        extra_body=extra_body,
+                    )
+                    return idx, completion
+                except openai.RateLimitError:
+                    if attempt < 3:
+                        await asyncio.sleep(10 * (attempt + 1))
+                    else:
+                        raise
+            return idx, None  # unreachable
 
     tasks = [asyncio.create_task(_request(i, conv)) for i, conv in enumerate(conversations)]
     results: list[ChatCompletion | None] = [None] * len(conversations)
 
-    for fut in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc=f"OpenRouter ({provider})"):
-        idx, completion = await fut
-        results[idx] = completion
+    try:
+        for fut in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc=f"OpenRouter ({provider})"):
+            idx, completion = await fut
+            results[idx] = completion
+    finally:
+        for t in tasks:
+            t.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
 
     return results  # type: ignore[return-value]
 
