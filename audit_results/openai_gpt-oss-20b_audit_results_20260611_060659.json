@@ -1,0 +1,173 @@
+{
+  "model": "openai/gpt-oss-20b",
+  "parameters": {
+    "n_prompts": 100,
+    "max_tokens": 200,
+    "seed": 42,
+    "top_k": 50,
+    "top_p": 0.95,
+    "temperature": 0.0,
+    "verification_backend": "vast",
+    "vast_verification_target": "openai/gpt-oss-20b",
+    "vast_verification_base_url": "http://84.8.116.228:40267/v1",
+    "vast_verification_strategy": "auto-managed-per-model",
+    "vast_server_name": "audit-openai-gpt-oss-20b-20260610200336324120"
+  },
+  "providers": {
+    "amazonbedrock": {
+      "error": "Error code: 404 - {'error': {'message': 'No allowed providers are available for the selected model.', 'code': 404, 'metadata': {'available_providers': ['dekallm', 'deepinfra', 'phala', 'novita', 'siliconflow', 'parasail', 'together', 'wandb', 'amazon-bedrock', 'google-vertex', 'fireworks', 'groq', 'nextbit'], 'requested_providers': ['amazonbedrock']}}}",
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    },
+    "deepinfra/bf16": {
+      "exact_match_rate": 0.9631573071340851,
+      "avg_prob": 0.6740977066092512,
+      "avg_margin": 0.0084117170927766,
+      "avg_logit_rank": 0.028246064530534777,
+      "avg_gumbel_rank": 0.028246064530534777,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 17914,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    },
+    "dekallm/bf16": {
+      "exact_match_rate": 0.9645616392341283,
+      "avg_prob": 0.6756656426986256,
+      "avg_margin": 0.006732168860083637,
+      "avg_logit_rank": 0.02480125405889598,
+      "avg_gumbel_rank": 0.02480125405889598,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 17862,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    },
+    "fireworks": {
+      "exact_match_rate": 0.9676875526833381,
+      "avg_prob": 0.6740974447186914,
+      "avg_margin": 0.00714737286089377,
+      "avg_logit_rank": 0.022646810901938746,
+      "avg_gumbel_rank": 0.022646810901938746,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 17795,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    },
+    "google-vertex": {
+      "exact_match_rate": 0.9742255990648744,
+      "avg_prob": 0.6790263511597893,
+      "avg_margin": 0.004661473574379186,
+      "avg_logit_rank": 0.011981297486849795,
+      "avg_gumbel_rank": 0.011981297486849795,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 17110,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    },
+    "groq": {
+      "exact_match_rate": 0.9774046317687497,
+      "avg_prob": 0.6829188017553772,
+      "avg_margin": 0.0023982926624663723,
+      "avg_logit_rank": 0.007945004789541894,
+      "avg_gumbel_rank": 0.007945004789541894,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 17747,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    },
+    "nextbit/fp8": {
+      "exact_match_rate": 0.9642538478697301,
+      "avg_prob": 0.6784443805652065,
+      "avg_margin": 0.010671186315516076,
+      "avg_logit_rank": 0.026767789426723178,
+      "avg_gumbel_rank": 0.026767789426723178,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 17932,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    },
+    "novita/fp4": {
+      "exact_match_rate": 0.949767337556764,
+      "avg_prob": 0.6709834755916815,
+      "avg_margin": 0.01268430785252761,
+      "avg_logit_rank": 0.038963951337108255,
+      "avg_gumbel_rank": 0.038963951337108255,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 17837,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    },
+    "parasail/fp4": {
+      "exact_match_rate": 0.9791442334939077,
+      "avg_prob": 0.6711511532268054,
+      "avg_margin": 0.002606970833529491,
+      "avg_logit_rank": 0.012298101445168602,
+      "avg_gumbel_rank": 0.012298101445168602,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 17645,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    },
+    "phala": {
+      "error": "Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'openai/gpt-oss-20b is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name': 'Phala', 'is_byok': False}}, 'user_id': 'redacted'}",
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    },
+    "siliconflow/fp8": {
+      "exact_match_rate": 0.9436789528074406,
+      "avg_prob": 0.6720493198150528,
+      "avg_margin": 0.013997732249846455,
+      "avg_logit_rank": 0.044953496383052016,
+      "avg_gumbel_rank": 0.044953496383052016,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 17418,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    },
+    "together": {
+      "exact_match_rate": 0.9518754423213022,
+      "avg_prob": 0.6732615943671185,
+      "avg_margin": 0.5407686621885757,
+      "avg_logit_rank": 0.0365652276480302,
+      "avg_gumbel_rank": 0.0365652276480302,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 4239,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    },
+    "wandb/fp4": {
+      "exact_match_rate": 0.9614338826924144,
+      "avg_prob": 0.6766642691819785,
+      "avg_margin": 0.011326629362322767,
+      "avg_logit_rank": 0.02907718772543144,
+      "avg_gumbel_rank": 0.02907718772543144,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 18021,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "openai/gpt-oss-20b"
+    }
+  },
+  "reference": {
+    "total_tokens": 17513,
+    "exact_match_rate": 0.9840689773311254,
+    "avg_prob": 0.6799166338885303,
+    "avg_margin": 0.0014310797965418351,
+    "infinite_margin_rate": 0.0,
+    "avg_logit_rank": 0.009535773425455377,
+    "avg_gumbel_rank": 0.009535773425455377,
+    "n_sequences": 100,
+    "verification_backend": "vast",
+    "verification_target": "openai/gpt-oss-20b",
+    "vast_verification_base_url": "http://84.8.116.228:40267/v1"
+  }
+}
