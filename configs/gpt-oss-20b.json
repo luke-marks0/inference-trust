@@ -9,5 +9,6 @@
   "trust_remote_code": false,
   "modal_gpu": "H100",
   "modal_min_containers": 0,
-  "modal_scaledown_window_seconds": 60
+  "modal_scaledown_window_seconds": 60,
+  "vast_gpu": "RTX_PRO_6000_WS"
 }

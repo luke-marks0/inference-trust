@@ -2,11 +2,14 @@
   "model": "deepseek-ai/DeepSeek-V4-Flash",
   "served_model_name": "",
   "tensor_parallel_size": 8,
-  "dtype": "auto",
+  "dtype": "bfloat16",
+  "kv_cache_dtype": "fp8",
+  "enforce_eager": true,
   "gpu_memory_utilization": 0.9,
   "max_model_len": 8192,
   "trust_remote_code": true,
   "modal_gpu": "H100:8",
   "modal_min_containers": 0,
-  "modal_scaledown_window_seconds": 60
+  "modal_scaledown_window_seconds": 60,
+  "vast_gpu": "B300"
 }

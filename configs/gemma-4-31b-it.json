@@ -3,13 +3,14 @@
   "served_model_name": "",
   "tensor_parallel_size": 1,
   "dtype": "bfloat16",
-  "gpu_memory_utilization": 0.9,
-  "max_model_len": 32768,
+  "gpu_memory_utilization": 0.95,
+  "max_model_len": 16384,
   "max_num_seqs": 0,
   "enforce_eager": true,
   "trust_remote_code": false,
   "modal_gpu": "H100",
   "modal_min_containers": 0,
   "modal_max_containers": 1,
-  "modal_scaledown_window_seconds": 60
+  "modal_scaledown_window_seconds": 60,
+  "vast_gpu": "H200"
 }

@@ -9,5 +9,6 @@
   "modal_gpu": "A100-80GB",
   "modal_min_containers": 1,
   "modal_max_containers": 1,
-  "modal_scaledown_window_seconds": 60
+  "modal_scaledown_window_seconds": 60,
+  "vast_gpu": "H200"
 }
