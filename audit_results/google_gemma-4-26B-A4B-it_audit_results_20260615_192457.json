@@ -1,0 +1,139 @@
+{
+  "model": "google/gemma-4-26B-A4B-it",
+  "parameters": {
+    "n_prompts": 100,
+    "max_tokens": 200,
+    "seed": 42,
+    "top_k": 50,
+    "top_p": 0.95,
+    "temperature": 0.0,
+    "verification_backend": "vast",
+    "vast_verification_target": "google/gemma-4-26B-A4B-it",
+    "vast_verification_base_url": "http://161.184.215.27:51571/v1",
+    "vast_verification_strategy": "auto-managed-per-model",
+    "vast_server_name": "audit-google-gemma-4-26b-a4b-it-20260615092457926787"
+  },
+  "providers": {
+    "cloudflare": {
+      "exact_match_rate": 0.9801425351769507,
+      "avg_prob": 0.8900111707195975,
+      "avg_margin": 0.005423113203603472,
+      "avg_logit_rank": 0.016141804227325335,
+      "avg_gumbel_rank": 0.016141804227325335,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16417,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-26B-A4B-it"
+    },
+    "deepinfra/fp8": {
+      "exact_match_rate": 0.9604112793990888,
+      "avg_prob": 0.8841600022507228,
+      "avg_margin": 0.021439400834926257,
+      "avg_logit_rank": 0.03577145671715306,
+      "avg_gumbel_rank": 0.03577145671715306,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16242,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-26B-A4B-it"
+    },
+    "dekallm/bf16": {
+      "exact_match_rate": 0.9665297996764962,
+      "avg_prob": 0.886340372131993,
+      "avg_margin": 0.015377943176779416,
+      "avg_logit_rank": 0.028306582057981835,
+      "avg_gumbel_rank": 0.028306582057981835,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16074,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-26B-A4B-it"
+    },
+    "google-vertex": {
+      "exact_match_rate": 0.9661627980519891,
+      "avg_prob": 0.8875594724986747,
+      "avg_margin": 0.016117141558333686,
+      "avg_logit_rank": 0.029030421858199987,
+      "avg_gumbel_rank": 0.029030421858199987,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 15811,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-26B-A4B-it"
+    },
+    "nextbit/bf16": {
+      "exact_match_rate": 0.9646886625602245,
+      "avg_prob": 0.8862915412359443,
+      "avg_margin": 0.01511334244591467,
+      "avg_logit_rank": 0.030920290297005548,
+      "avg_gumbel_rank": 0.030920290297005548,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16397,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-26B-A4B-it"
+    },
+    "novita/bf16": {
+      "exact_match_rate": 0.96207473508087,
+      "avg_prob": 0.8864992293708412,
+      "avg_margin": 0.018927774657146443,
+      "avg_logit_rank": 0.0338352853690277,
+      "avg_gumbel_rank": 0.0338352853690277,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16137,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-26B-A4B-it"
+    },
+    "parasail/bf16": {
+      "exact_match_rate": 0.9807668824032238,
+      "avg_prob": 0.8877900791934379,
+      "avg_margin": 0.00574274561477677,
+      "avg_logit_rank": 0.015630724142141898,
+      "avg_gumbel_rank": 0.015630724142141898,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16378,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-26B-A4B-it"
+    },
+    "siliconflow/fp8": {
+      "exact_match_rate": 0.9530176867440588,
+      "avg_prob": 0.8834450071895382,
+      "avg_margin": 0.028500899086532958,
+      "avg_logit_rank": 0.042423874065519965,
+      "avg_gumbel_rank": 0.042423874065519965,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16453,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-26B-A4B-it"
+    },
+    "venice/bf16": {
+      "exact_match_rate": 0.980028095034508,
+      "avg_prob": 0.8903011700595437,
+      "avg_margin": 0.005458204795246431,
+      "avg_logit_rank": 0.015757649789287242,
+      "avg_gumbel_rank": 0.015757649789287242,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16373,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-26B-A4B-it"
+    }
+  },
+  "reference": {
+    "total_tokens": 16446,
+    "exact_match_rate": 0.9821233126596133,
+    "avg_prob": 0.8909021581687459,
+    "avg_margin": 0.004320959485709399,
+    "infinite_margin_rate": 0.0,
+    "avg_logit_rank": 0.013802748388665936,
+    "avg_gumbel_rank": 0.013802748388665936,
+    "n_sequences": 100,
+    "verification_backend": "vast",
+    "verification_target": "google/gemma-4-26B-A4B-it",
+    "vast_verification_base_url": "http://161.184.215.27:51571/v1"
+  }
+}

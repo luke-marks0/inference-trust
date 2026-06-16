@@ -1,0 +1,163 @@
+{
+  "model": "deepseek-ai/DeepSeek-V3.2",
+  "parameters": {
+    "n_prompts": 100,
+    "max_tokens": 200,
+    "seed": 42,
+    "top_k": 50,
+    "top_p": 0.95,
+    "temperature": 0.0,
+    "verification_backend": "vast",
+    "vast_verification_target": "deepseek-ai/DeepSeek-V3.2",
+    "vast_verification_base_url": "http://198.145.108.60:25879/v1",
+    "vast_verification_strategy": "auto-managed-per-model",
+    "vast_server_name": "audit-deepseek-ai-deepseek-v3-2-20260616130948560883"
+  },
+  "providers": {
+    "alibaba": {
+      "exact_match_rate": 0.7545099028636306,
+      "avg_prob": 0.6900938667079418,
+      "avg_margin": 0.4203119083056613,
+      "avg_logit_rank": 0.23167654850510913,
+      "avg_gumbel_rank": 0.23167654850510913,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 15854,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "deepseek-ai/DeepSeek-V3.2"
+    },
+    "atlas-cloud/fp8": {
+      "exact_match_rate": 0.909170579029734,
+      "avg_prob": 0.8173108706212164,
+      "avg_margin": 0.08244131438795577,
+      "avg_logit_rank": 0.07987480438184663,
+      "avg_gumbel_rank": 0.07987480438184663,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 15975,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "deepseek-ai/DeepSeek-V3.2"
+    },
+    "baidu/fp8": {
+      "exact_match_rate": 0.9447385003150599,
+      "avg_prob": 0.8372135365053204,
+      "avg_margin": 0.030741965947244328,
+      "avg_logit_rank": 0.04410838059231254,
+      "avg_gumbel_rank": 0.04410838059231254,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 15870,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "deepseek-ai/DeepSeek-V3.2"
+    },
+    "deepinfra/fp4": {
+      "exact_match_rate": 0.894525952410307,
+      "avg_prob": 0.8082440958177508,
+      "avg_margin": 0.1048653063465026,
+      "avg_logit_rank": 0.09548760941930712,
+      "avg_gumbel_rank": 0.09548760941930712,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16222,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "deepseek-ai/DeepSeek-V3.2"
+    },
+    "digitalocean": {
+      "exact_match_rate": 0.8050903814763315,
+      "avg_prob": 0.7426880327990215,
+      "avg_margin": 0.3105616342790051,
+      "avg_logit_rank": 0.18511577292787618,
+      "avg_gumbel_rank": 0.18511577292787618,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16541,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "deepseek-ai/DeepSeek-V3.2"
+    },
+    "friendli": {
+      "exact_match_rate": 0.9000376269910949,
+      "avg_prob": 0.8099569402036034,
+      "avg_margin": 0.10157719766399903,
+      "avg_logit_rank": 0.08999122036874452,
+      "avg_gumbel_rank": 0.08999122036874452,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 15946,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "deepseek-ai/DeepSeek-V3.2"
+    },
+    "google-vertex": {
+      "exact_match_rate": 0.9406226462465478,
+      "avg_prob": 0.8381325658187814,
+      "avg_margin": 0.03272501888053369,
+      "avg_logit_rank": 0.047577203113231235,
+      "avg_gumbel_rank": 0.047577203113231235,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 15932,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "deepseek-ai/DeepSeek-V3.2"
+    },
+    "novita/fp8": {
+      "exact_match_rate": 0.9178920795203535,
+      "avg_prob": 0.8223980133387334,
+      "avg_margin": 0.06633796119546996,
+      "avg_logit_rank": 0.07106342694856421,
+      "avg_gumbel_rank": 0.07106342694856421,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 15845,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "deepseek-ai/DeepSeek-V3.2"
+    },
+    "sambanova": {
+      "exact_match_rate": 0.9476017486607967,
+      "avg_prob": 0.8353961691613347,
+      "avg_margin": 0.02626069818332229,
+      "avg_logit_rank": 0.04162305276768672,
+      "avg_gumbel_rank": 0.04162305276768672,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16241,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "deepseek-ai/DeepSeek-V3.2"
+    },
+    "siliconflow/fp8": {
+      "exact_match_rate": 0.9459708648349622,
+      "avg_prob": 0.8312496897610572,
+      "avg_margin": 0.028758682114115593,
+      "avg_logit_rank": 0.043702747556702934,
+      "avg_gumbel_rank": 0.043702747556702934,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16269,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "deepseek-ai/DeepSeek-V3.2"
+    },
+    "streamlake": {
+      "exact_match_rate": 0.9304922942534473,
+      "avg_prob": 0.8255175221751774,
+      "avg_margin": 0.05229066569389954,
+      "avg_logit_rank": 0.05865102639296188,
+      "avg_gumbel_rank": 0.05865102639296188,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16027,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "deepseek-ai/DeepSeek-V3.2"
+    }
+  },
+  "reference": {
+    "total_tokens": 16112,
+    "exact_match_rate": 0.9468718967229395,
+    "avg_prob": 0.8346083208380367,
+    "avg_margin": 0.029473373869872376,
+    "infinite_margin_rate": 0.0,
+    "avg_logit_rank": 0.04505958291956306,
+    "avg_gumbel_rank": 0.04505958291956306,
+    "n_sequences": 100,
+    "verification_backend": "vast",
+    "verification_target": "deepseek-ai/DeepSeek-V3.2",
+    "vast_verification_base_url": "http://198.145.108.60:25879/v1"
+  }
+}

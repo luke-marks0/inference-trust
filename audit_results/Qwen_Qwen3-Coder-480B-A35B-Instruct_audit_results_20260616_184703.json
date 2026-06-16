@@ -1,0 +1,91 @@
+{
+  "model": "Qwen/Qwen3-Coder-480B-A35B-Instruct",
+  "parameters": {
+    "n_prompts": 100,
+    "max_tokens": 200,
+    "seed": 42,
+    "top_k": 50,
+    "top_p": 0.95,
+    "temperature": 0.0,
+    "verification_backend": "vast",
+    "vast_verification_target": "Qwen/Qwen3-Coder-480B-A35B-Instruct",
+    "vast_verification_base_url": "http://198.145.108.60:21234/v1",
+    "vast_verification_strategy": "auto-managed-per-model",
+    "vast_server_name": "audit-qwen-qwen3-coder-480b-a35b-instruct-20260616084704247242"
+  },
+  "providers": {
+    "alibaba": {
+      "exact_match_rate": 0.9307304785894207,
+      "avg_prob": 0.9074562968130162,
+      "avg_margin": 0.09450566733363894,
+      "avg_logit_rank": 0.06448362720403022,
+      "avg_gumbel_rank": 0.06448362720403022,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 15880,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-Coder-480B-A35B-Instruct"
+    },
+    "atlas-cloud/fp8": {
+      "exact_match_rate": 0.9589605846711224,
+      "avg_prob": 0.9218670474786086,
+      "avg_margin": 0.039524642299299674,
+      "avg_logit_rank": 0.03641701542882129,
+      "avg_gumbel_rank": 0.03641701542882129,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16009,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-Coder-480B-A35B-Instruct"
+    },
+    "novita/fp8": {
+      "exact_match_rate": 0.9524403166490057,
+      "avg_prob": 0.9191770055473426,
+      "avg_margin": 0.044754721587014705,
+      "avg_logit_rank": 0.042884747241787695,
+      "avg_gumbel_rank": 0.042884747241787695,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16043,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-Coder-480B-A35B-Instruct"
+    },
+    "venice/fp8": {
+      "exact_match_rate": 0.9200729467991448,
+      "avg_prob": 0.8967361989035307,
+      "avg_margin": 0.12731889048817321,
+      "avg_logit_rank": 0.07552509118349893,
+      "avg_gumbel_rank": 0.07552509118349893,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 15902,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-Coder-480B-A35B-Instruct"
+    },
+    "wandb/bf16": {
+      "exact_match_rate": 0.984504842236801,
+      "avg_prob": 0.9359717787781969,
+      "avg_margin": 0.006560449827763856,
+      "avg_logit_rank": 0.012121212121212121,
+      "avg_gumbel_rank": 0.012121212121212121,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16005,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-Coder-480B-A35B-Instruct"
+    }
+  },
+  "reference": {
+    "total_tokens": 3146,
+    "exact_match_rate": 0.9707565162110616,
+    "avg_prob": 0.9379027503497013,
+    "avg_margin": 0.027177368058039744,
+    "infinite_margin_rate": 0.0,
+    "avg_logit_rank": 0.0270184361093452,
+    "avg_gumbel_rank": 0.0270184361093452,
+    "n_sequences": 100,
+    "verification_backend": "vast",
+    "verification_target": "Qwen/Qwen3-Coder-480B-A35B-Instruct",
+    "vast_verification_base_url": "http://198.145.108.60:21234/v1"
+  }
+}

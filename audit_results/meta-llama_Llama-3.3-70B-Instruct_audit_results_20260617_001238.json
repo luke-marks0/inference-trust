@@ -1,0 +1,151 @@
+{
+  "model": "meta-llama/Llama-3.3-70B-Instruct",
+  "parameters": {
+    "n_prompts": 100,
+    "max_tokens": 200,
+    "seed": 42,
+    "top_k": 50,
+    "top_p": 0.95,
+    "temperature": 0.0,
+    "verification_backend": "vast",
+    "vast_verification_target": "meta-llama/Llama-3.3-70B-Instruct",
+    "vast_verification_base_url": "http://212.247.220.148:30991/v1",
+    "vast_verification_strategy": "auto-managed-per-model",
+    "vast_server_name": "audit-meta-llama-llama-3-3-70b-instruct-20260616141239148842"
+  },
+  "providers": {
+    "akashml/fp8": {
+      "exact_match_rate": 0.968313373253493,
+      "avg_prob": 0.9130238982698795,
+      "avg_margin": 0.01901665412841324,
+      "avg_logit_rank": 0.02719560878243513,
+      "avg_gumbel_rank": 0.02719560878243513,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16032,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "meta-llama/Llama-3.3-70B-Instruct"
+    },
+    "cloudflare/fp8": {
+      "exact_match_rate": 0.9789841228012386,
+      "avg_prob": 0.9189324326973678,
+      "avg_margin": 0.02189085246805256,
+      "avg_logit_rank": 0.01765597206667106,
+      "avg_gumbel_rank": 0.01765597206667106,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 15179,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "meta-llama/Llama-3.3-70B-Instruct"
+    },
+    "google-vertex": {
+      "exact_match_rate": 0.9754593506166624,
+      "avg_prob": 0.9175776807639843,
+      "avg_margin": 0.009304996185134107,
+      "avg_logit_rank": 0.019632519506670023,
+      "avg_gumbel_rank": 0.019632519506670023,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 15892,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "meta-llama/Llama-3.3-70B-Instruct"
+    },
+    "groq": {
+      "exact_match_rate": 0.958856303189861,
+      "avg_prob": 0.9094262318431536,
+      "avg_margin": 0.03323026996171825,
+      "avg_logit_rank": 0.03759260393069246,
+      "avg_gumbel_rank": 0.03759260393069246,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16333,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "meta-llama/Llama-3.3-70B-Instruct"
+    },
+    "nebius/fp8": {
+      "exact_match_rate": 0.9630676580839427,
+      "avg_prob": 0.9104336166618726,
+      "avg_margin": 0.026070792082158494,
+      "avg_logit_rank": 0.0331223499047502,
+      "avg_gumbel_rank": 0.0331223499047502,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16273,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "meta-llama/Llama-3.3-70B-Instruct"
+    },
+    "novita/bf16": {
+      "exact_match_rate": 0.966126213007052,
+      "avg_prob": 0.9128312510949227,
+      "avg_margin": 0.02458411185710241,
+      "avg_logit_rank": 0.031040925803146283,
+      "avg_gumbel_rank": 0.031040925803146283,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16591,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "meta-llama/Llama-3.3-70B-Instruct"
+    },
+    "parasail/fp8": {
+      "exact_match_rate": 0.9672328635104205,
+      "avg_prob": 0.912776653451564,
+      "avg_margin": 0.022986688282587143,
+      "avg_logit_rank": 0.029153114082640645,
+      "avg_gumbel_rank": 0.029153114082640645,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16602,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "meta-llama/Llama-3.3-70B-Instruct"
+    },
+    "sambanova/bf16": {
+      "exact_match_rate": 0.982335865604348,
+      "avg_prob": 0.9185968590305483,
+      "avg_margin": 0.009345469699869867,
+      "avg_logit_rank": 0.014143660058056945,
+      "avg_gumbel_rank": 0.014143660058056945,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16191,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "meta-llama/Llama-3.3-70B-Instruct"
+    },
+    "together/fp8": {
+      "exact_match_rate": 0.9696411012782694,
+      "avg_prob": 0.9146274641354054,
+      "avg_margin": 0.017353429194382274,
+      "avg_logit_rank": 0.025442477876106196,
+      "avg_gumbel_rank": 0.025442477876106196,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16272,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "meta-llama/Llama-3.3-70B-Instruct"
+    },
+    "wandb/fp16": {
+      "exact_match_rate": 0.9677674872044846,
+      "avg_prob": 0.9113792663436658,
+      "avg_margin": 0.02174475986820124,
+      "avg_logit_rank": 0.02839385815257129,
+      "avg_gumbel_rank": 0.02839385815257129,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16412,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "meta-llama/Llama-3.3-70B-Instruct"
+    }
+  },
+  "reference": {
+    "total_tokens": 16132,
+    "exact_match_rate": 0.9944210265311183,
+    "avg_prob": 0.9229581783870417,
+    "avg_margin": 0.0006315088079225742,
+    "infinite_margin_rate": 0.0,
+    "avg_logit_rank": 0.003533349863625093,
+    "avg_gumbel_rank": 0.003533349863625093,
+    "n_sequences": 100,
+    "verification_backend": "vast",
+    "verification_target": "meta-llama/Llama-3.3-70B-Instruct",
+    "vast_verification_base_url": "http://212.247.220.148:30991/v1"
+  }
+}

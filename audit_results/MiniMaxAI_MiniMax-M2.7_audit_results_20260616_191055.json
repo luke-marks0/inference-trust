@@ -1,0 +1,115 @@
+{
+  "model": "MiniMaxAI/MiniMax-M2.7",
+  "parameters": {
+    "n_prompts": 100,
+    "max_tokens": 200,
+    "seed": 42,
+    "top_k": 50,
+    "top_p": 0.95,
+    "temperature": 0.0,
+    "verification_backend": "vast",
+    "vast_verification_target": "MiniMaxAI/MiniMax-M2.7",
+    "vast_verification_base_url": "http://38.9.57.155:28800/v1",
+    "vast_verification_strategy": "auto-managed-per-model",
+    "vast_server_name": "audit-minimaxai-minimax-m2-7-20260616091055398470"
+  },
+  "providers": {
+    "deepinfra/fp8": {
+      "exact_match_rate": 0.8783013122196999,
+      "avg_prob": 0.7968583279263427,
+      "avg_margin": 0.34589399276668925,
+      "avg_logit_rank": 0.1138364431648303,
+      "avg_gumbel_rank": 0.1138364431648303,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 18061,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "MiniMaxAI/MiniMax-M2.7"
+    },
+    "mara": {
+      "exact_match_rate": 0.918732556230504,
+      "avg_prob": 0.8145565506969455,
+      "avg_margin": 0.2894445099293328,
+      "avg_logit_rank": 0.07459092650358452,
+      "avg_gumbel_rank": 0.07459092650358452,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 18273,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "MiniMaxAI/MiniMax-M2.7"
+    },
+    "minimax/fp8": {
+      "exact_match_rate": 0.8167998224589437,
+      "avg_prob": 0.749953576827592,
+      "avg_margin": 0.4786337398247247,
+      "avg_logit_rank": 0.17637594318686195,
+      "avg_gumbel_rank": 0.17637594318686195,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 18024,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "MiniMaxAI/MiniMax-M2.7"
+    },
+    "morph": {
+      "exact_match_rate": 0.8820078587636283,
+      "avg_prob": 0.8012206472773817,
+      "avg_margin": 0.34644647749730817,
+      "avg_logit_rank": 0.11151696275388788,
+      "avg_gumbel_rank": 0.11151696275388788,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 18069,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "MiniMaxAI/MiniMax-M2.7"
+    },
+    "novita/fp8": {
+      "exact_match_rate": 0.8768708618483281,
+      "avg_prob": 0.7991478212867512,
+      "avg_margin": 0.31201250641312683,
+      "avg_logit_rank": 0.11611862237801146,
+      "avg_gumbel_rank": 0.11611862237801146,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 17973,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "MiniMaxAI/MiniMax-M2.7"
+    },
+    "sambanova": {
+      "exact_match_rate": 0.918732556230504,
+      "avg_prob": 0.8145565506969455,
+      "avg_margin": 0.2894445099293328,
+      "avg_logit_rank": 0.07459092650358452,
+      "avg_gumbel_rank": 0.07459092650358452,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 18273,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "MiniMaxAI/MiniMax-M2.7"
+    },
+    "together/fp4": {
+      "exact_match_rate": 0.8800685007181527,
+      "avg_prob": 0.7921575847061934,
+      "avg_margin": 0.38331939306374796,
+      "avg_logit_rank": 0.11363385261297095,
+      "avg_gumbel_rank": 0.11363385261297095,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 18102,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "MiniMaxAI/MiniMax-M2.7"
+    }
+  },
+  "reference": {
+    "total_tokens": 18028,
+    "exact_match_rate": 0.9403150654537387,
+    "avg_prob": 0.8294968109624569,
+    "avg_margin": 0.03293141227571774,
+    "infinite_margin_rate": 0.0,
+    "avg_logit_rank": 0.053472376303527844,
+    "avg_gumbel_rank": 0.053472376303527844,
+    "n_sequences": 100,
+    "verification_backend": "vast",
+    "verification_target": "MiniMaxAI/MiniMax-M2.7",
+    "vast_verification_base_url": "http://38.9.57.155:28800/v1"
+  }
+}

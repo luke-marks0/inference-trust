@@ -1,0 +1,91 @@
+{
+  "model": "Qwen/Qwen3.5-27B",
+  "parameters": {
+    "n_prompts": 100,
+    "max_tokens": 200,
+    "seed": 42,
+    "top_k": 50,
+    "top_p": 0.95,
+    "temperature": 0.0,
+    "verification_backend": "vast",
+    "vast_verification_target": "Qwen/Qwen3.5-27B",
+    "vast_verification_base_url": "http://210.157.233.86:30916/v1",
+    "vast_verification_strategy": "auto-managed-per-model",
+    "vast_server_name": "audit-qwen-qwen3-5-27b-20260615085103591896"
+  },
+  "providers": {
+    "atlas-cloud/fp8": {
+      "exact_match_rate": 0.9732809034079452,
+      "avg_prob": 0.8633132506222023,
+      "avg_margin": 0.17435785934830847,
+      "avg_logit_rank": 0.023543053034886064,
+      "avg_gumbel_rank": 0.023543053034886064,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 19836,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3.5-27B"
+    },
+    "deepinfra/fp8": {
+      "exact_match_rate": 0.9637352674524026,
+      "avg_prob": 0.8633936521797637,
+      "avg_margin": 0.17016092447898556,
+      "avg_logit_rank": 0.03193311171552332,
+      "avg_gumbel_rank": 0.03193311171552332,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 19854,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3.5-27B"
+    },
+    "novita/bf16": {
+      "exact_match_rate": 0.9722166196046793,
+      "avg_prob": 0.8630235620238271,
+      "avg_margin": 0.17247220376576325,
+      "avg_logit_rank": 0.02379991932230738,
+      "avg_gumbel_rank": 0.02379991932230738,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 19832,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3.5-27B"
+    },
+    "phala": {
+      "exact_match_rate": 0.9661350560209953,
+      "avg_prob": 0.8654038866768597,
+      "avg_margin": 0.17280237441516805,
+      "avg_logit_rank": 0.02801049762793984,
+      "avg_gumbel_rank": 0.02801049762793984,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 19814,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3.5-27B"
+    },
+    "siliconflow/fp8": {
+      "exact_match_rate": 0.9685610640870617,
+      "avg_prob": 0.8639761109118349,
+      "avg_margin": 0.17048002310106228,
+      "avg_logit_rank": 0.027307537283353486,
+      "avg_gumbel_rank": 0.027307537283353486,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 19848,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3.5-27B"
+    }
+  },
+  "reference": {
+    "total_tokens": 19840,
+    "exact_match_rate": 0.9953125,
+    "avg_prob": 0.8740130381095373,
+    "avg_margin": 0.0003465221744150885,
+    "infinite_margin_rate": 0.0,
+    "avg_logit_rank": 0.0025201612903225806,
+    "avg_gumbel_rank": 0.0025201612903225806,
+    "n_sequences": 100,
+    "verification_backend": "vast",
+    "verification_target": "Qwen/Qwen3.5-27B",
+    "vast_verification_base_url": "http://210.157.233.86:30916/v1"
+  }
+}

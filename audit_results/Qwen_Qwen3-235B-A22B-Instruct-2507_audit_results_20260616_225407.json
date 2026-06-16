@@ -1,0 +1,127 @@
+{
+  "model": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+  "parameters": {
+    "n_prompts": 100,
+    "max_tokens": 200,
+    "seed": 42,
+    "top_k": 50,
+    "top_p": 0.95,
+    "temperature": 0.0,
+    "verification_backend": "vast",
+    "vast_verification_target": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+    "vast_verification_base_url": "http://198.145.108.60:20005/v1",
+    "vast_verification_strategy": "auto-managed-per-model",
+    "vast_server_name": "audit-qwen-qwen3-235b-a22b-instruct-2507-20260616125407772451"
+  },
+  "providers": {
+    "alibaba": {
+      "exact_match_rate": 0.8768098007672318,
+      "avg_prob": 0.8044344680460066,
+      "avg_margin": 0.13647850677454004,
+      "avg_logit_rank": 0.12213834921420616,
+      "avg_gumbel_rank": 0.12213834921420616,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16162,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-235B-A22B-Instruct-2507"
+    },
+    "atlas-cloud/fp8": {
+      "exact_match_rate": 0.9457542768273717,
+      "avg_prob": 0.8372967639334882,
+      "avg_margin": 0.030172045112212376,
+      "avg_logit_rank": 0.053063763608087094,
+      "avg_gumbel_rank": 0.053063763608087094,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16075,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-235B-A22B-Instruct-2507"
+    },
+    "friendli": {
+      "exact_match_rate": 0.9401406259722481,
+      "avg_prob": 0.8364717822299521,
+      "avg_margin": 0.03748551349516463,
+      "avg_logit_rank": 0.05873934416028872,
+      "avg_gumbel_rank": 0.05873934416028872,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16071,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-235B-A22B-Instruct-2507"
+    },
+    "google-vertex": {
+      "exact_match_rate": 0.9576366358871974,
+      "avg_prob": 0.8435612379727528,
+      "avg_margin": 0.017167222964323336,
+      "avg_logit_rank": 0.04080359371100574,
+      "avg_gumbel_rank": 0.04080359371100574,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16028,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-235B-A22B-Instruct-2507"
+    },
+    "novita/fp8": {
+      "exact_match_rate": 0.9438306852035749,
+      "avg_prob": 0.8379735894726179,
+      "avg_margin": 0.030327744892952813,
+      "avg_logit_rank": 0.055424528301886794,
+      "avg_gumbel_rank": 0.055424528301886794,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16112,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-235B-A22B-Instruct-2507"
+    },
+    "streamlake": {
+      "exact_match_rate": 0.9791395045632334,
+      "avg_prob": 0.8535892827126681,
+      "avg_margin": 0.00506476222258703,
+      "avg_logit_rank": 0.01961879927981623,
+      "avg_gumbel_rank": 0.01961879927981623,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16107,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-235B-A22B-Instruct-2507"
+    },
+    "together": {
+      "exact_match_rate": 0.9626465452731354,
+      "avg_prob": 0.8465964786368676,
+      "avg_margin": 0.01573510380472498,
+      "avg_logit_rank": 0.036418059366425545,
+      "avg_gumbel_rank": 0.036418059366425545,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16036,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-235B-A22B-Instruct-2507"
+    },
+    "wandb/bf16": {
+      "exact_match_rate": 0.9799900571712652,
+      "avg_prob": 0.8496589284533046,
+      "avg_margin": 0.004427665946882458,
+      "avg_logit_rank": 0.01932637335321899,
+      "avg_gumbel_rank": 0.01932637335321899,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16092,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3-235B-A22B-Instruct-2507"
+    }
+  },
+  "reference": {
+    "total_tokens": 16065,
+    "exact_match_rate": 0.9884842826019297,
+    "avg_prob": 0.8501876273956248,
+    "avg_margin": 0.001550342348035236,
+    "infinite_margin_rate": 0.0,
+    "avg_logit_rank": 0.010084033613445379,
+    "avg_gumbel_rank": 0.010084033613445379,
+    "n_sequences": 100,
+    "verification_backend": "vast",
+    "verification_target": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+    "vast_verification_base_url": "http://198.145.108.60:20005/v1"
+  }
+}

@@ -497,6 +497,78 @@ def _sanitize_results_for_public_output(value: Any, *, parent_key: str = "") -> 
 
 
 # ---------------------------------------------------------------------------
+# Collected-token persistence helpers
+# ---------------------------------------------------------------------------
+
+
+def _update_collected_tokens_file(
+    path: str,
+    hf_model: str,
+    collected: dict[str, tuple[list[TokenSequence], int]],
+    conversations: list[list[dict[str, str]]],
+) -> None:
+    """Upsert collected provider sequences for a model into a JSON file."""
+    payload: dict = {}
+    if os.path.exists(path):
+        try:
+            with open(path) as f:
+                payload = json.load(f)
+        except Exception:
+            payload = {}
+
+    payload.setdefault("version", 1)
+    payload.setdefault("models", {})
+
+    now = datetime.utcnow().isoformat()
+    providers_data: dict = {}
+    for provider, (sequences, vocab_size) in collected.items():
+        providers_data[provider] = {
+            "sequences": [s.to_dict() for s in sequences],
+            "vocab_size": vocab_size,
+            "collected_at": now,
+        }
+
+    payload["models"][hf_model] = {
+        "conversations": conversations,
+        "providers": providers_data,
+        "collected_at": now,
+    }
+
+    with open(path, "w") as f:
+        json.dump(payload, f, indent=2)
+
+    total_seqs = sum(len(d["sequences"]) for d in providers_data.values())
+    print(
+        f"Saved collected tokens for {hf_model} "
+        f"({len(providers_data)} providers, {total_seqs} sequences) to {path}"
+    )
+
+
+def _load_model_collected_tokens(
+    path: str,
+    hf_model: str,
+) -> dict[str, tuple[list[TokenSequence], int]] | None:
+    """Load collected provider sequences for a model from a JSON file.
+
+    Returns dict[provider -> (sequences, vocab_size)], or None if the model
+    is not present in the file.
+    """
+    with open(path) as f:
+        payload = json.load(f)
+
+    model_data = payload.get("models", {}).get(hf_model)
+    if model_data is None:
+        return None
+
+    result: dict[str, tuple[list[TokenSequence], int]] = {}
+    for provider, pdata in model_data.get("providers", {}).items():
+        sequences = [TokenSequence.from_dict(s) for s in pdata["sequences"]]
+        vocab_size = int(pdata["vocab_size"])
+        result[provider] = (sequences, vocab_size)
+    return result
+
+
+# ---------------------------------------------------------------------------
 # vast.ai server lifecycle helpers (called from _main_vast)
 # ---------------------------------------------------------------------------
 
@@ -523,6 +595,7 @@ def _start_vast_verification_server_for_model(
     vast_num_gpus: int | None,
     vast_disk_gb: float | None,
     vast_max_price: float | None,
+    vast_on_demand: bool = False,
 ) -> tuple[str, str]:
     """Start a vast.ai vLLM server via serve.py and return (server_name, base_url)."""
     timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S%f")
@@ -537,6 +610,8 @@ def _start_vast_verification_server_for_model(
         command.extend(["--disk-gb", str(vast_disk_gb)])
     if vast_max_price is not None:
         command.extend(["--max-price", str(vast_max_price)])
+    if vast_on_demand:
+        command.append("--on-demand")
 
     print(f"Starting vast.ai verification server {server_name}...")
     stderr_lines: list[str] = []
@@ -738,9 +813,12 @@ def _main_vast(
     vast_num_gpus: int | None,
     vast_disk_gb: float | None,
     vast_max_price: float | None,
+    vast_on_demand: bool = False,
+    collect_only: bool = False,
+    save_collected_tokens: str | None = None,
+    from_collected_tokens: str | None = None,
+    profile_timing: bool = False,
 ) -> None:
-    from token_difr.common import construct_prompts as _construct_prompts
-
     raw_base_url = vast_verification_base_url or os.environ.get("VAST_VERIFICATION_BASE_URL")
     fixed_base_url = (
         _normalize_openai_base_url(raw_base_url, ensure_v1_path=True)
@@ -748,7 +826,7 @@ def _main_vast(
         else None
     )
     auto_manage = fixed_base_url is None
-    if auto_manage:
+    if auto_manage and not collect_only:
         print(
             "No vast.ai verification base URL provided. "
             "Auto-managing per-model vast.ai verification servers."
@@ -768,11 +846,131 @@ def _main_vast(
             print(f"No providers listed for {hf_model}")
             continue
 
+        verification_target = vast_verification_model or hf_model
+
+        # Load prompts / reference tokens — no GPU needed.
+        reference_sequences: list[TokenSequence] = []
+        if use_reference_tokens:
+            prompts, reference_sequences = _load_reference_bundle(hf_model)
+            print(f"Loaded {len(reference_sequences)} reference sequences")
+        else:
+            prompts = construct_prompts(
+                n_prompts=N_PROMPTS,
+                model_name=hf_model,
+                system_prompt="You are a helpful assistant.",
+            )
+            print(f"Constructed {len(prompts)} prompts")
+
+        # Set up the results file early so progress is visible from the first save,
+        # mirroring the fireworks path.
+        results: dict = {
+            "model": hf_model,
+            "parameters": {
+                "n_prompts": N_PROMPTS,
+                "max_tokens": MAX_TOKENS,
+                "seed": SEED,
+                "top_k": TOP_K,
+                "top_p": TOP_P,
+                "temperature": TEMPERATURE,
+                "verification_backend": "vast",
+                "vast_verification_target": verification_target,
+                "vast_verification_base_url": fixed_base_url,
+                "vast_verification_strategy": (
+                    "auto-managed-per-model" if auto_manage else "fixed-base-url"
+                ),
+                "vast_server_name": None,
+            },
+            "providers": {},
+        }
+
+        safe_model_name = hf_model.replace("/", "_")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_dir = "audit_results"
+        os.makedirs(output_dir, exist_ok=True)
+        output_file = f"{output_dir}/{safe_model_name}_audit_results_{timestamp}.json"
+
+        save_results(results, output_file)
+        print(f"Results will be saved to {output_file}")
+
+        # ---------------------------------------------------------------
+        # Phase 1: Collect provider token sequences (no vast instance).
+        # ---------------------------------------------------------------
+        collected_provider_sequences: dict[str, tuple[list[TokenSequence], int]] = {}
+
+        if from_collected_tokens:
+            print(f"\nLoading pre-collected tokens for {hf_model} from {from_collected_tokens} ...")
+            loaded = _load_model_collected_tokens(from_collected_tokens, hf_model)
+            if loaded is None:
+                print(f"  Model {hf_model} not found in {from_collected_tokens}; skipping.")
+                continue
+            for provider in providers:
+                if provider in loaded:
+                    seqs, vocab_size = loaded[provider]
+                    collected_provider_sequences[provider] = (seqs, vocab_size)
+                    token_count = sum(len(s.output_token_ids) for s in seqs)
+                    results["providers"][provider] = {
+                        "collection_complete": True,
+                        "collected_sequences": len(seqs),
+                        "collected_tokens": token_count,
+                    }
+                else:
+                    print(f"  Provider {provider} not in collected tokens file, skipping.")
+            save_results(results, output_file)
+        else:
+            for provider in providers:
+                print(f"\nCollecting tokens for provider: {provider}")
+                try:
+                    sequences, vocab_size = collect_provider_sequences(
+                        prompts,
+                        model=hf_model,
+                        provider=provider,
+                        max_tokens=MAX_TOKENS,
+                        seed=SEED,
+                        temperature=TEMPERATURE,
+                    )
+                    collected_provider_sequences[provider] = (sequences, vocab_size)
+                    token_count = sum(len(s.output_token_ids) for s in sequences)
+                    results["providers"][provider] = {
+                        "collection_complete": True,
+                        "collected_sequences": len(sequences),
+                        "collected_tokens": token_count,
+                    }
+                    print(f"  Collected {token_count} tokens across {len(sequences)} sequences")
+                except Exception as collection_error:
+                    print(f"  ERROR during token collection: {collection_error}")
+                    results["providers"][provider] = {
+                        "error": str(collection_error),
+                        "collection_complete": False,
+                    }
+                save_results(results, output_file)
+
+        if save_collected_tokens and not from_collected_tokens:
+            _update_collected_tokens_file(
+                save_collected_tokens, hf_model, collected_provider_sequences, prompts
+            )
+
+        if collect_only:
+            print(f"Collection complete for {hf_model}. Skipping verification (--collect-only).")
+            continue
+
+        if not collected_provider_sequences:
+            print(f"No provider sequences collected for {hf_model}; skipping verification.")
+            continue
+
+        # ---------------------------------------------------------------
+        # Phase 2: Start vast instance (billing begins here).
+        # ---------------------------------------------------------------
         verification_base_url = fixed_base_url
         vast_server_name: str | None = None
 
+        # Optional timing profile (enabled via --profile-timing):
+        # (download weights + start vLLM server) vs auditing.
+        _profile_server_seconds = 0.0
+        _profile_audit_seconds = 0.0
+
         try:
             if auto_manage:
+                _profile_server_start = time.time()
                 vast_server_name, verification_base_url = (
                     _start_vast_verification_server_for_model(
                         hf_model=hf_model,
@@ -780,11 +978,16 @@ def _main_vast(
                         vast_num_gpus=vast_num_gpus,
                         vast_disk_gb=vast_disk_gb,
                         vast_max_price=vast_max_price,
+                        vast_on_demand=vast_on_demand,
                     )
                 )
+                _profile_server_seconds = time.time() - _profile_server_start
+                results["parameters"]["vast_server_name"] = vast_server_name
+                results["parameters"]["vast_verification_base_url"] = verification_base_url
                 print(
                     f"Using auto-managed vast verification endpoint for {hf_model}: {verification_base_url}"
                 )
+                save_results(results, output_file)
 
             if not verification_base_url:
                 raise ValueError(
@@ -792,30 +995,7 @@ def _main_vast(
                     "Pass --vast-verification-base-url or configure auto-managed mode."
                 )
 
-            verification_target = vast_verification_model or hf_model
-            results = {
-                "model": hf_model,
-                "parameters": {
-                    "n_prompts": N_PROMPTS,
-                    "max_tokens": MAX_TOKENS,
-                    "seed": SEED,
-                    "top_k": TOP_K,
-                    "top_p": TOP_P,
-                    "temperature": TEMPERATURE,
-                    "verification_backend": "vast",
-                    "vast_verification_target": verification_target,
-                    "vast_verification_base_url": verification_base_url,
-                    "vast_verification_strategy": (
-                        "auto-managed-per-model" if auto_manage else "fixed-base-url"
-                    ),
-                    "vast_server_name": vast_server_name,
-                },
-                "providers": {},
-            }
-
             if use_reference_tokens:
-                prompts, reference_sequences = _load_reference_bundle(hf_model)
-                print(f"Loaded {len(reference_sequences)} reference sequences")
                 reference_metrics = _compute_reference_metrics(
                     hf_model,
                     reference_sequences,
@@ -824,37 +1004,29 @@ def _main_vast(
                     local_verification_model=verification_target,
                 )
                 results["reference"] = reference_metrics
-            else:
-                prompts = construct_prompts(
-                    n_prompts=N_PROMPTS,
-                    model_name=hf_model,
-                    system_prompt="You are a helpful assistant.",
-                )
-                print(f"Constructed {len(prompts)} prompts")
+                save_results(results, output_file)
 
-            safe_model_name = hf_model.replace("/", "_")
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            output_dir = "audit_results"
-            os.makedirs(output_dir, exist_ok=True)
-            output_file = f"{output_dir}/{safe_model_name}_audit_results_{timestamp}.json"
-            save_results(results, output_file)
-            print(f"Results will be saved to {output_file}")
-
+            # ---------------------------------------------------------------
+            # Phase 3: Verify all pre-collected sequences (vast is now running).
+            # ---------------------------------------------------------------
+            _profile_audit_start = time.time()
             for provider in providers:
-                print(f"\nAuditing provider: {provider}")
+                if provider not in collected_provider_sequences:
+                    continue
+                sequences, vocab_size = collected_provider_sequences[provider]
+                print(f"\nVerifying provider: {provider}")
                 try:
-                    result = audit_provider(
-                        prompts,
+                    result = verify_provider_sequences(
+                        sequences,
+                        vocab_size=vocab_size,
                         model=hf_model,
-                        provider=provider,
-                        max_tokens=MAX_TOKENS,
                         seed=SEED,
                         top_k=TOP_K,
                         top_p=TOP_P,
                         temperature=TEMPERATURE,
                         verification_backend="vast",
-                        verification_model=verification_target,
                         verification_base_url=verification_base_url,
+                        verification_model=verification_target,
                     )
                     provider_results = asdict(result)
                     provider_results["verification_backend"] = "vast"
@@ -874,7 +1046,22 @@ def _main_vast(
 
                 save_results(results, output_file)
 
+            _profile_audit_seconds = time.time() - _profile_audit_start
+
             print(f"\nAll results saved to {output_file}")
+
+            if profile_timing:
+                def _fmt_secs(s: float) -> str:
+                    return f"{s:.1f}s ({s / 60:.1f} min)"
+
+                print("\n=== TIMING PROFILE for", hf_model, "===")
+                print(f"  Download weights + start vLLM server: {_fmt_secs(_profile_server_seconds)}")
+                print(f"  Auditing (verification):              {_fmt_secs(_profile_audit_seconds)}")
+                print(
+                    f"  Total:                                "
+                    f"{_fmt_secs(_profile_server_seconds + _profile_audit_seconds)}"
+                )
+                print("=" * (len("=== TIMING PROFILE for ") + len(hf_model) + 4))
         finally:
             if auto_manage and vast_server_name and vast_stop_after_verification:
                 try:
@@ -994,6 +1181,55 @@ def parse_args() -> argparse.Namespace:
         action="store_false",
         help="Leave the vast.ai instance running after the audit.",
     )
+    parser.add_argument(
+        "--vast-on-demand",
+        dest="vast_on_demand",
+        action="store_true",
+        default=False,
+        help=(
+            "Search on-demand vast.ai offers instead of interruptible (spot) instances. "
+            "Interruptible instances are cheaper but can be reclaimed; on-demand are stable."
+        ),
+    )
+    # Token collection / verification decoupling
+    parser.add_argument(
+        "--collect-only",
+        action="store_true",
+        help=(
+            "Collect provider token sequences and save them (requires --save-collected-tokens), "
+            "then exit without running verification. No GPU instance is started."
+        ),
+    )
+    parser.add_argument(
+        "--save-collected-tokens",
+        default=None,
+        metavar="PATH",
+        help=(
+            "After collecting provider tokens, write them to this JSON file. "
+            "Multiple runs append/update the file. Use with --collect-only to "
+            "pre-collect tokens for all models before any GPU instance starts."
+        ),
+    )
+    parser.add_argument(
+        "--from-collected-tokens",
+        default=None,
+        metavar="PATH",
+        help=(
+            "Skip provider token collection; load previously saved sequences from "
+            "this JSON file (written by --save-collected-tokens). Only the "
+            "verification phase runs, minimising GPU instance uptime."
+        ),
+    )
+    parser.add_argument(
+        "--profile-timing",
+        dest="profile_timing",
+        action="store_true",
+        default=False,
+        help=(
+            "Print a timing breakdown (weight download + vLLM startup vs. "
+            "verification) for each model after the audit completes."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -1106,6 +1342,11 @@ def main(
     vast_num_gpus: int | None = None,
     vast_disk_gb: float | None = None,
     vast_max_price: float | None = None,
+    vast_on_demand: bool = False,
+    collect_only: bool = False,
+    save_collected_tokens: str | None = None,
+    from_collected_tokens: str | None = None,
+    profile_timing: bool = False,
 ) -> None:
     backend = verification_backend.strip().lower()
     if backend == "vast":
@@ -1119,6 +1360,11 @@ def main(
             vast_num_gpus=vast_num_gpus,
             vast_disk_gb=vast_disk_gb,
             vast_max_price=vast_max_price,
+            vast_on_demand=vast_on_demand,
+            collect_only=collect_only,
+            save_collected_tokens=save_collected_tokens,
+            from_collected_tokens=from_collected_tokens,
+            profile_timing=profile_timing,
         )
         return
     if backend != "fireworks":
@@ -1361,30 +1607,60 @@ def main(
 
             collected_provider_sequences: dict[str, tuple[list[TokenSequence], int]] = {}
             skip_remaining_providers = False
-            for provider in providers:
-                print(f"\nCollecting tokens for provider: {provider}")
-                try:
-                    sequences, vocab_size = collect_provider_sequences(
-                        prompts,
-                        model=HF_MODEL,
-                        provider=provider,
-                        max_tokens=MAX_TOKENS,
-                        seed=SEED,
-                        temperature=TEMPERATURE,
-                    )
-                    collected_provider_sequences[provider] = (sequences, vocab_size)
-                    token_count = sum(len(sequence.output_token_ids) for sequence in sequences)
-                    results["providers"][provider] = {
-                        "collection_complete": True,
-                        "collected_sequences": len(sequences),
-                        "collected_tokens": token_count,
-                    }
-                    print(f"  Collected {token_count} tokens across {len(sequences)} sequences")
-                except Exception as provider_error:
-                    print(f"  ERROR during token collection: {provider_error}")
-                    results["providers"][provider] = {"error": str(provider_error), "collection_complete": False}
 
+            if from_collected_tokens:
+                print(f"\nLoading pre-collected tokens for {HF_MODEL} from {from_collected_tokens} ...")
+                loaded = _load_model_collected_tokens(from_collected_tokens, HF_MODEL)
+                if loaded is None:
+                    print(f"  Model {HF_MODEL} not found in {from_collected_tokens}; skipping.")
+                    continue
+                for provider in providers:
+                    if provider in loaded:
+                        seqs, vocab_size = loaded[provider]
+                        collected_provider_sequences[provider] = (seqs, vocab_size)
+                        token_count = sum(len(s.output_token_ids) for s in seqs)
+                        results["providers"][provider] = {
+                            "collection_complete": True,
+                            "collected_sequences": len(seqs),
+                            "collected_tokens": token_count,
+                        }
+                    else:
+                        print(f"  Provider {provider} not in collected tokens file, skipping verification.")
                 save_results(results, output_file)
+            else:
+                for provider in providers:
+                    print(f"\nCollecting tokens for provider: {provider}")
+                    try:
+                        sequences, vocab_size = collect_provider_sequences(
+                            prompts,
+                            model=HF_MODEL,
+                            provider=provider,
+                            max_tokens=MAX_TOKENS,
+                            seed=SEED,
+                            temperature=TEMPERATURE,
+                        )
+                        collected_provider_sequences[provider] = (sequences, vocab_size)
+                        token_count = sum(len(sequence.output_token_ids) for sequence in sequences)
+                        results["providers"][provider] = {
+                            "collection_complete": True,
+                            "collected_sequences": len(sequences),
+                            "collected_tokens": token_count,
+                        }
+                        print(f"  Collected {token_count} tokens across {len(sequences)} sequences")
+                    except Exception as provider_error:
+                        print(f"  ERROR during token collection: {provider_error}")
+                        results["providers"][provider] = {"error": str(provider_error), "collection_complete": False}
+
+                    save_results(results, output_file)
+
+            if save_collected_tokens and not from_collected_tokens:
+                _update_collected_tokens_file(
+                    save_collected_tokens, HF_MODEL, collected_provider_sequences, prompts
+                )
+
+            if collect_only:
+                print(f"Collection complete for {HF_MODEL}. Skipping verification (--collect-only).")
+                continue
 
             for provider in providers:
                 if provider not in collected_provider_sequences:
@@ -1627,4 +1903,9 @@ if __name__ == "__main__":
         args.vast_num_gpus,
         args.vast_disk_gb,
         args.vast_max_price,
+        vast_on_demand=args.vast_on_demand,
+        collect_only=args.collect_only,
+        save_collected_tokens=args.save_collected_tokens,
+        from_collected_tokens=args.from_collected_tokens,
+        profile_timing=args.profile_timing,
     )

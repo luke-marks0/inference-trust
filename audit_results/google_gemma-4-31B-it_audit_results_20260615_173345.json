@@ -1,0 +1,127 @@
+{
+  "model": "google/gemma-4-31B-it",
+  "parameters": {
+    "n_prompts": 100,
+    "max_tokens": 200,
+    "seed": 42,
+    "top_k": 50,
+    "top_p": 0.95,
+    "temperature": 0.0,
+    "verification_backend": "vast",
+    "vast_verification_target": "google/gemma-4-31B-it",
+    "vast_verification_base_url": "http://198.53.64.194:40584/v1",
+    "vast_verification_strategy": "auto-managed-per-model",
+    "vast_server_name": "audit-google-gemma-4-31b-it-20260615073345992387"
+  },
+  "providers": {
+    "ambient": {
+      "exact_match_rate": 0.9713436900414681,
+      "avg_prob": 0.8965125101860371,
+      "avg_margin": 0.05141057279091214,
+      "avg_logit_rank": 0.024200037135606856,
+      "avg_gumbel_rank": 0.024200037135606856,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16157,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-31B-it"
+    },
+    "chutes/fp4": {
+      "exact_match_rate": 0.9250788156023985,
+      "avg_prob": 0.876228791071146,
+      "avg_margin": 0.09220024948325861,
+      "avg_logit_rank": 0.07152129566668727,
+      "avg_gumbel_rank": 0.07152129566668727,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16177,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-31B-it"
+    },
+    "novita/bf16": {
+      "exact_match_rate": 0.96529284164859,
+      "avg_prob": 0.897769835678662,
+      "avg_margin": 0.01923225907522863,
+      "avg_logit_rank": 0.03154632785869228,
+      "avg_gumbel_rank": 0.03154632785869228,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16135,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-31B-it"
+    },
+    "parasail/fp8": {
+      "exact_match_rate": 0.9688990768849514,
+      "avg_prob": 0.8999856613589341,
+      "avg_margin": 0.01507370590934685,
+      "avg_logit_rank": 0.026764141007372528,
+      "avg_gumbel_rank": 0.026764141007372528,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16141,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-31B-it"
+    },
+    "phala": {
+      "exact_match_rate": 0.9254310344827587,
+      "avg_prob": 0.8734833100540049,
+      "avg_margin": 0.09584612154534884,
+      "avg_logit_rank": 0.07032019704433498,
+      "avg_gumbel_rank": 0.07032019704433498,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16240,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-31B-it"
+    },
+    "siliconflow/fp8": {
+      "exact_match_rate": 0.9659745894019213,
+      "avg_prob": 0.8993096261732826,
+      "avg_margin": 0.01891559490966915,
+      "avg_logit_rank": 0.029625038735667804,
+      "avg_gumbel_rank": 0.029625038735667804,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16135,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-31B-it"
+    },
+    "venice/bf16": {
+      "exact_match_rate": 0.979781691887869,
+      "avg_prob": 0.9027434828140385,
+      "avg_margin": 0.007180677803108042,
+      "avg_logit_rank": 0.01662118580997271,
+      "avg_gumbel_rank": 0.01662118580997271,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16124,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-31B-it"
+    },
+    "wandb/bf16": {
+      "exact_match_rate": 0.978966197878115,
+      "avg_prob": 0.9015942258672325,
+      "avg_margin": 0.007721903511706088,
+      "avg_logit_rank": 0.017147791759190723,
+      "avg_gumbel_rank": 0.017147791759190723,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 16212,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "google/gemma-4-31B-it"
+    }
+  },
+  "reference": {
+    "total_tokens": 16133,
+    "exact_match_rate": 0.9915700737618546,
+    "avg_prob": 0.905367622350439,
+    "avg_margin": 0.001049866729089156,
+    "infinite_margin_rate": 0.0,
+    "avg_logit_rank": 0.00570259716109837,
+    "avg_gumbel_rank": 0.00570259716109837,
+    "n_sequences": 100,
+    "verification_backend": "vast",
+    "verification_target": "google/gemma-4-31B-it",
+    "vast_verification_base_url": "http://198.53.64.194:40584/v1"
+  }
+}

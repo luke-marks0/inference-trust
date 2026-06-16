@@ -9,31 +9,31 @@
     "temperature": 0.0,
     "verification_backend": "vast",
     "vast_verification_target": "Qwen/Qwen3-8B",
-    "vast_verification_base_url": "http://84.8.116.228:40246/v1",
+    "vast_verification_base_url": "http://198.53.64.194:40693/v1",
     "vast_verification_strategy": "auto-managed-per-model",
-    "vast_server_name": "audit-qwen-qwen3-8b-20260610161005151745"
+    "vast_server_name": "audit-qwen-qwen3-8b-20260615074312182187"
   },
   "providers": {
     "alibaba": {
-      "exact_match_rate": 0.9092211646709651,
-      "avg_prob": 0.8404493300353973,
-      "avg_margin": 0.27498281188404505,
-      "avg_logit_rank": 0.08975539862859482,
-      "avg_gumbel_rank": 0.08975539862859482,
+      "exact_match_rate": 0.9097894575072998,
+      "avg_prob": 0.8425760390608807,
+      "avg_margin": 0.2857482294101133,
+      "avg_logit_rank": 0.089493366118539,
+      "avg_gumbel_rank": 0.089493366118539,
       "infinite_margin_rate": 0.0,
-      "total_tokens": 19542,
+      "total_tokens": 19521,
       "n_sequences": 100,
       "verification_backend": "vast",
       "verification_target": "Qwen/Qwen3-8B"
     },
     "atlas-cloud/fp8": {
-      "exact_match_rate": 0.9102322980735017,
-      "avg_prob": 0.8434671371335629,
-      "avg_margin": 0.2835935475968905,
-      "avg_logit_rank": 0.08824276927769023,
-      "avg_gumbel_rank": 0.08824276927769023,
+      "exact_match_rate": 0.9139420111042567,
+      "avg_prob": 0.8446827841322833,
+      "avg_margin": 0.27805932219010576,
+      "avg_logit_rank": 0.0851326341764343,
+      "avg_gumbel_rank": 0.0851326341764343,
       "infinite_margin_rate": 0.0,
-      "total_tokens": 19673,
+      "total_tokens": 19452,
       "n_sequences": 100,
       "verification_backend": "vast",
       "verification_target": "Qwen/Qwen3-8B"
@@ -41,15 +41,15 @@
   },
   "reference": {
     "total_tokens": 3170,
-    "exact_match_rate": 0.9943217665615142,
-    "avg_prob": 0.7266593060844022,
-    "avg_margin": 0.00026123817034700317,
+    "exact_match_rate": 0.9946372239747634,
+    "avg_prob": 0.7266948136486324,
+    "avg_margin": 0.0002489156151419558,
     "infinite_margin_rate": 0.0,
     "avg_logit_rank": 0.005047318611987382,
     "avg_gumbel_rank": 0.005047318611987382,
     "n_sequences": 100,
     "verification_backend": "vast",
     "verification_target": "Qwen/Qwen3-8B",
-    "vast_verification_base_url": "http://84.8.116.228:40246/v1"
+    "vast_verification_base_url": "http://198.53.64.194:40693/v1"
   }
 }

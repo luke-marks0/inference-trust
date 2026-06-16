@@ -1,0 +1,67 @@
+{
+  "model": "Qwen/Qwen3.5-9B",
+  "parameters": {
+    "n_prompts": 100,
+    "max_tokens": 200,
+    "seed": 42,
+    "top_k": 50,
+    "top_p": 0.95,
+    "temperature": 0.0,
+    "verification_backend": "vast",
+    "vast_verification_target": "Qwen/Qwen3.5-9B",
+    "vast_verification_base_url": "http://212.247.220.158:19856/v1",
+    "vast_verification_strategy": "auto-managed-per-model",
+    "vast_server_name": "audit-qwen-qwen3-5-9b-20260615084547843977"
+  },
+  "providers": {
+    "siliconflow/fp8": {
+      "exact_match_rate": 0.9538554642190731,
+      "avg_prob": 0.8329594681812531,
+      "avg_margin": 0.17979821215431474,
+      "avg_logit_rank": 0.0402945181300116,
+      "avg_gumbel_rank": 0.0402945181300116,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 19829,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3.5-9B"
+    },
+    "together": {
+      "exact_match_rate": 0.959154858554788,
+      "avg_prob": 0.8287972745900392,
+      "avg_margin": 0.18113134107763568,
+      "avg_logit_rank": 0.03418889617265897,
+      "avg_gumbel_rank": 0.03418889617265897,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 19831,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3.5-9B"
+    },
+    "venice/fp8": {
+      "exact_match_rate": 0.9665915351865765,
+      "avg_prob": 0.8308493439096712,
+      "avg_margin": 0.17970980460590627,
+      "avg_logit_rank": 0.028549962434259956,
+      "avg_gumbel_rank": 0.028549962434259956,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 19965,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "Qwen/Qwen3.5-9B"
+    }
+  },
+  "reference": {
+    "total_tokens": 19839,
+    "exact_match_rate": 0.9938504964967992,
+    "avg_prob": 0.845056868374552,
+    "avg_margin": 0.0004032461313574273,
+    "infinite_margin_rate": 0.0,
+    "avg_logit_rank": 0.0031251575180200617,
+    "avg_gumbel_rank": 0.0031251575180200617,
+    "n_sequences": 100,
+    "verification_backend": "vast",
+    "verification_target": "Qwen/Qwen3.5-9B",
+    "vast_verification_base_url": "http://212.247.220.158:19856/v1"
+  }
+}

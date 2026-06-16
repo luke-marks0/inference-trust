@@ -40,6 +40,7 @@ VASTAI_API_BASE = "https://console.vast.ai/api/v0"
 DEFAULT_VAST_GPU = os.environ.get("VAST_DEFAULT_GPU", "H100_SXM4_80GB")
 DEFAULT_VAST_DISK_GB = float(os.environ.get("VAST_DEFAULT_DISK_GB", "200"))
 DEFAULT_VAST_MAX_PRICE = float(os.environ.get("VAST_DEFAULT_MAX_PRICE", "10.0"))
+DEFAULT_VAST_INSTANCE_TYPE = os.environ.get("VAST_DEFAULT_INSTANCE_TYPE", "bid")
 DEFAULT_VAST_VLLM_IMAGE = os.environ.get("VAST_VLLM_IMAGE", "vllm/vllm-openai:latest")
 DEFAULT_VAST_INSTANCE_TIMEOUT = int(os.environ.get("VAST_INSTANCE_TIMEOUT_SECONDS", "600"))
 DEFAULT_VAST_READY_TIMEOUT = int(os.environ.get("VAST_READY_TIMEOUT_SECONDS", "3600"))
@@ -141,6 +142,7 @@ def _load_vast_profile(hf_model: str) -> dict[str, Any]:
     profile["vast_disk_gb"] = DEFAULT_VAST_DISK_GB
     profile["vast_max_price"] = DEFAULT_VAST_MAX_PRICE
     profile["vast_vllm_image"] = DEFAULT_VAST_VLLM_IMAGE
+    profile["vast_instance_type"] = DEFAULT_VAST_INSTANCE_TYPE
 
     for candidate in _config_file_candidates(hf_model):
         if not candidate.is_file():
@@ -167,6 +169,8 @@ def _load_vast_profile(hf_model: str) -> dict[str, Any]:
         )
         if isinstance(payload.get("vast_vllm_image"), str) and payload["vast_vllm_image"].strip():
             profile["vast_vllm_image"] = payload["vast_vllm_image"].strip()
+        if payload.get("vast_instance_type") in ("bid", "on-demand", "on_demand", "ondemand"):
+            profile["vast_instance_type"] = payload["vast_instance_type"]
         break
 
     return profile
@@ -576,20 +580,23 @@ def _search_vast_offers(
     num_gpus: int,
     disk_gb: float,
     max_price: float,
+    instance_type: str = "bid",
 ) -> list[dict]:
     """Return available offers sorted cheapest-first."""
     query = {
-        "gpu_name": {"in": [gpu_name]},
+        "verified": {"eq": True},
+        "external": {"eq": False},
+        "rentable": {"eq": True},
+        "rented": {"eq": False},
+        "gpu_name": {"eq": gpu_name.replace("_", " ")},
         "num_gpus": {"gte": num_gpus, "lte": num_gpus},
         "disk_space": {"gte": disk_gb},
         "dph_total": {"lte": max_price},
-        "rentable": {"eq": True},
-        "rented": {"eq": False},
-        "direct_port_count": {"gte": 1},
         "order": [["dph_total", "asc"]],
-        "type": "on-demand",
+        "type": instance_type,
+        "allocated_storage": disk_gb,
     }
-    result = _vastai_request("GET", "/bundles/", api_key, params={"q": json.dumps(query)})
+    result = _vastai_request("POST", "/bundles/", api_key, payload=query)
     offers = result.get("offers", [])
     return offers if isinstance(offers, list) else []
 
@@ -603,8 +610,14 @@ def _create_vast_instance(
     disk_gb: float,
     label: str,
     env_vars: dict[str, str],
+    bid_price: float | None = None,
 ) -> int:
-    """Rent a vast.ai instance and return its contract/instance ID."""
+    """Rent a vast.ai instance and return its contract/instance ID.
+
+    If ``bid_price`` is set, the instance is created as an interruptible/spot
+    instance with that bid (``price``). If it is None, vast.ai creates an
+    on-demand instance billed at the offer's full ``dph_total``.
+    """
     # vast.ai expects env as Docker CLI flags: {"-e KEY": "value", "-p PORT:PORT": "1"}
     env_payload: dict[str, str] = {f"-e {k}": v for k, v in env_vars.items()}
     env_payload["-p 8000:8000"] = "1"
@@ -617,6 +630,10 @@ def _create_vast_instance(
         "runtype": "ssh_direct",
         "env": env_payload,
     }
+    if bid_price is not None:
+        # Without a `price` field, vast.ai creates an on-demand instance and
+        # ignores the search `type=bid`. Setting it makes the rental interruptible.
+        body["price"] = float(bid_price)
     response = _vastai_request("PUT", f"/asks/{offer_id}/", api_key, payload=body)
     if not response.get("success"):
         raise RuntimeError(f"vast.ai instance creation failed: {response}")
@@ -675,6 +692,7 @@ def _build_vllm_onstart(
     enforce_eager: bool,
     trust_remote_code: bool,
     extra_args: str,
+    hf_token: str = "",
     port: int = 8000,
 ) -> str:
     """Build the bash onstart command that launches vLLM in the background."""
@@ -699,7 +717,14 @@ def _build_vllm_onstart(
         parts.extend(shlex.split(extra_args))
 
     cmd = " ".join(shlex.quote(str(p)) for p in parts)
-    return f"nohup {cmd} > /var/log/vllm.log 2>&1 &"
+    # Export the HF token in the onstart shell itself: vast's `-e` env vars are
+    # not reliably inherited by the onstart script under runtype=ssh_direct, so
+    # vLLM (launched here) would otherwise miss it and 401 on gated models.
+    prefix = ""
+    if hf_token:
+        quoted = shlex.quote(hf_token)
+        prefix = f"export HF_TOKEN={quoted}; export HUGGING_FACE_HUB_TOKEN={quoted}; "
+    return f"{prefix}nohup {cmd} > /var/log/vllm.log 2>&1 &"
 
 
 def _vast_start(args: argparse.Namespace) -> None:
@@ -716,6 +741,7 @@ def _vast_start(args: argparse.Namespace) -> None:
     disk_gb = args.disk_gb if args.disk_gb is not None else float(profile["vast_disk_gb"])
     max_price = args.max_price if args.max_price is not None else float(profile["vast_max_price"])
     vllm_image = args.vllm_image or profile["vast_vllm_image"]
+    instance_type = "on-demand" if getattr(args, "on_demand", False) else profile["vast_instance_type"]
     instance_timeout = args.instance_timeout
     ready_timeout = args.ready_timeout
 
@@ -739,21 +765,37 @@ def _vast_start(args: argparse.Namespace) -> None:
         enforce_eager=bool(profile["enforce_eager"]),
         trust_remote_code=bool(profile["trust_remote_code"]),
         extra_args=str(profile["extra_args"]),
+        hf_token=hf_token,
     )
 
-    print(f"Searching vast.ai: gpu={gpu} x{num_gpus}, disk>={disk_gb:.0f}GB, max ${max_price:.2f}/hr...")
-    offers = _search_vast_offers(api_key, gpu_name=gpu, num_gpus=num_gpus, disk_gb=disk_gb, max_price=max_price)
+    type_label = "interruptible/spot (bid)" if instance_type == "bid" else instance_type
+    print(f"Searching vast.ai: gpu={gpu} x{num_gpus}, disk>={disk_gb:.0f}GB, max ${max_price:.2f}/hr, type={type_label}...")
+    offers = _search_vast_offers(
+        api_key,
+        gpu_name=gpu,
+        num_gpus=num_gpus,
+        disk_gb=disk_gb,
+        max_price=max_price,
+        instance_type=instance_type,
+    )
     if not offers:
         raise RuntimeError(
             f"No vast.ai offers found for gpu={gpu} x{num_gpus}, "
-            f"disk>={disk_gb:.0f}GB, max ${max_price:.2f}/hr. "
-            "Check https://vast.ai/console for availability, or relax constraints with --vast-gpu / --max-price."
+            f"disk>={disk_gb:.0f}GB, max ${max_price:.2f}/hr, type={instance_type}. "
+            "Check https://vast.ai/console for availability, or relax constraints with "
+            "--vast-gpu / --max-price / --on-demand."
         )
 
     best = offers[0]
     offer_id = int(best["id"])
     actual_price = float(best.get("dph_total", 0))
-    print(f"Best offer #{offer_id}: {gpu} x{num_gpus} @ ${actual_price:.3f}/hr")
+    # For a bid (interruptible) rental, bid slightly above the minimum for
+    # stability, but never exceed the user's max price.
+    bid_price = min(actual_price * 1.1, max_price) if instance_type == "bid" else None
+    if bid_price is not None:
+        print(f"Best offer #{offer_id}: {gpu} x{num_gpus} @ ${actual_price:.3f}/hr (bidding ${bid_price:.3f}/hr)")
+    else:
+        print(f"Best offer #{offer_id}: {gpu} x{num_gpus} @ ${actual_price:.3f}/hr (on-demand)")
 
     env_vars: dict[str, str] = {"HF_HOME": "/root/.cache/huggingface"}
     if hf_token:
@@ -771,6 +813,7 @@ def _vast_start(args: argparse.Namespace) -> None:
         disk_gb=disk_gb,
         label=label,
         env_vars=env_vars,
+        bid_price=bid_price,
     )
     print(f"Created instance {instance_id}. Waiting for it to reach running state...")
 
@@ -853,7 +896,6 @@ def _vast_start(args: argparse.Namespace) -> None:
     print("  Note: large model downloads can take 10-30 minutes on first start.")
     health_url = root_url + "/health"
     health_start = time.time()
-    last_health_print = health_start
     ready = False
     while True:
         elapsed_health = time.time() - health_start
@@ -880,11 +922,6 @@ def _vast_start(args: argparse.Namespace) -> None:
                     break
         except (urllib.error.URLError, urllib.error.HTTPError):
             pass
-
-        now = time.time()
-        if now - last_health_print >= 30:
-            print(f"  [{int(elapsed_health)}s] vLLM not ready yet — model still downloading/loading...")
-            last_health_print = now
 
         time.sleep(5)
 
@@ -1024,6 +1061,13 @@ def parse_args() -> argparse.Namespace:
     vast_start.add_argument(
         "--ready-timeout", type=int, default=DEFAULT_VAST_READY_TIMEOUT,
         help="Seconds to wait for vLLM /health to respond (includes model download).",
+    )
+    vast_start.add_argument(
+        "--on-demand",
+        dest="on_demand",
+        action="store_true",
+        default=False,
+        help="Search on-demand offers instead of interruptible (spot) instances.",
     )
 
     vast_stop = vast_subparsers.add_parser("stop", help="Destroy vast.ai vLLM server(s).")

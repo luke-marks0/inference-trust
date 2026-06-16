@@ -1,0 +1,43 @@
+{
+  "model": "moonshotai/Kimi-K2-Thinking",
+  "parameters": {
+    "n_prompts": 100,
+    "max_tokens": 200,
+    "seed": 42,
+    "top_k": 50,
+    "top_p": 0.95,
+    "temperature": 0.0,
+    "verification_backend": "vast",
+    "vast_verification_target": "moonshotai/Kimi-K2-Thinking",
+    "vast_verification_base_url": "http://198.145.108.60:27862/v1",
+    "vast_verification_strategy": "auto-managed-per-model",
+    "vast_server_name": "audit-moonshotai-kimi-k2-thinking-20260616072405367725"
+  },
+  "providers": {
+    "google-vertex": {
+      "exact_match_rate": 0.9386893279808144,
+      "avg_prob": 0.8855566841079142,
+      "avg_margin": 0.05449077200481885,
+      "avg_logit_rank": 0.05677493352797039,
+      "avg_gumbel_rank": 0.05677493352797039,
+      "infinite_margin_rate": 0.0,
+      "total_tokens": 19181,
+      "n_sequences": 100,
+      "verification_backend": "vast",
+      "verification_target": "moonshotai/Kimi-K2-Thinking"
+    }
+  },
+  "reference": {
+    "total_tokens": 211,
+    "exact_match_rate": 0.8246445497630331,
+    "avg_prob": 0.7753673461135582,
+    "avg_margin": 1.826292208726937,
+    "infinite_margin_rate": 0.0,
+    "avg_logit_rank": 0.16587677725118483,
+    "avg_gumbel_rank": 0.16587677725118483,
+    "n_sequences": 100,
+    "verification_backend": "vast",
+    "verification_target": "moonshotai/Kimi-K2-Thinking",
+    "vast_verification_base_url": "http://198.145.108.60:27862/v1"
+  }
+}
